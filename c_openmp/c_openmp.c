@@ -4,6 +4,8 @@
 #include <time.h>
 #include <omp.h>
 
+#define DEBUG 0
+
 #ifndef M_PI
     #define M_PI 3.14159265358979323846
 #endif
@@ -64,14 +66,21 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    double exact = integrate(a, b, n);
-    printf("Exact: %.6lf\n", exact);
-
+    clock_t start_time = clock();
     double approx = monte_carlo(a, b, n);
+    clock_t end_time = clock();
+
     printf("Approx: %.6lf\n", approx);
 
-    double error = fabs(exact - approx);
-    printf("Error: %.6lf\n", error);
+    double elapsed_time = ((double) (end_time - start_time)) / CLOCKS_PER_SEC;
+    printf("Elapsed time: %lf seconds\n", elapsed_time);
+
+    if (DEBUG) {
+        double exact = integrate(a, b, n);
+        printf("Exact: %.6lf\n", exact);
+        double error = fabs(exact - approx);
+        printf("Error: %.6lf\n", error);
+    }
 
     return 0;
 }

@@ -4,6 +4,8 @@
 #include <math.h>
 #include <time.h>
 
+#define DEBUG 0
+
 #ifndef M_PI
     #define M_PI 3.14159265358979323846
 #endif
@@ -93,7 +95,7 @@ int main(int argc, char *argv[]) {
     MPI_Bcast(&b, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-    double exact = integrate(a, b, n);
+    double start_time = MPI_Wtime();
 
     double local_approx = monte_carlo(a, b, n, rank, size);
     double approx = 0.0;
@@ -106,11 +108,19 @@ int main(int argc, char *argv[]) {
 
     if (rank == 0) {
         approx /= size;
-        double error = fabs(exact - approx);
-
-        printf("Exact integral: %.10f\n", exact);
         printf("Approximate integral: %.10f\n", approx);
-        printf("Error: %.10f\n", error);
+        
+        double end_time = MPI_Wtime();
+        double elapsed_time = end_time - start_time;
+
+        printf("Elapsed time: %f seconds\n", elapsed_time);
+
+        if (DEBUG) {
+            double exact = integrate(a, b, n);
+            double error = fabs(exact - approx);
+            printf("Exact integral: %.10f\n", exact);
+            printf("Error: %.10f\n", error);
+        }
     }
 
     MPI_Finalize();

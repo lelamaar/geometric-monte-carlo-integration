@@ -3,6 +3,8 @@ import math
 import random
 import sys
 
+debug = False
+
 def f(x):
     # Define the integrand function here
     return math.pow(math.sin(x) * math.cos(2 * x), 2) + math.sqrt(6 * x)
@@ -70,9 +72,9 @@ if __name__ == '__main__':
     b = comm.bcast(b, root=0)
     n = comm.bcast(int(n), root=0)
 
-    exact = integrate(a, b, n)
-
+    t1 = MPI.Wtime()
     local_approx = monte_carlo(a, b, n, rank, size)
+    t2 = MPI.Wtime()
     approx = 0.0
 
     if rank == 0:
@@ -82,8 +84,11 @@ if __name__ == '__main__':
 
     if rank == 0:
         approx /= size
-        error = abs(exact - approx)
-
-        print("Exact integral: {:.10f}".format(exact))
         print("Approximate integral: {:.10f}".format(approx))
-        print("Error: {:.10f}".format(error))
+        print("Time taken: {:.10f} seconds".format(t2 - t1))
+        
+        if debug:
+            exact = integrate(a, b, n)
+            error = abs(exact - approx)
+            print("Exact integral: {:.10f}".format(exact))
+            print("Error: {:.10f}".format(error))
