@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <math.h>
-#include <time.h>
+#include <sys/time.h>
 
 #define DEBUG 0
 
@@ -101,15 +101,16 @@ int main(int argc, char *argv[]) {
     if (DEBUG) {
         double exact = integrate(a, b, n);
         printf("Exact: %.6lf\n", exact);
-    }
+    }  
 
-    clock_t start_time = clock();
+    struct timeval start_time, end_time;
+    gettimeofday(&start_time, NULL);
     double approx = geometric_monte_carlo(a, b, n);
-    clock_t end_time = clock();
+    gettimeofday(&end_time, NULL);
 
     printf("Approx: %.6lf\n", approx);
 
-    double elapsed_time = ((double) (end_time - start_time)) / CLOCKS_PER_SEC;
+    double elapsed_time = (end_time.tv_sec - start_time.tv_sec) + (end_time.tv_usec - start_time.tv_usec) / 1000000.0;
 
     printf("Elapsed time: %lf seconds\n", elapsed_time);
 
